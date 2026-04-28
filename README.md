@@ -1,6 +1,6 @@
 # Stock Analyst
 
-A spec-driven stock analysis application built with .NET 10 (C#) and JavaScript, using the [GitHub Spec Kit](https://github.com/github/spec-kit) methodology.
+A spec-driven stock analysis application built with .NET 10 (C#) and ASP.NET Core Blazor, using the [GitHub Spec Kit](https://github.com/github/spec-kit) methodology.
 
 ## Project Structure
 
@@ -8,13 +8,11 @@ A spec-driven stock analysis application built with .NET 10 (C#) and JavaScript,
 stock-analyst/
 ├── src/
 │   ├── StockAnalyst.Core/       # C# business logic & domain models
-│   └── StockAnalyst.Api/        # ASP.NET Core 10 Web API
+│   ├── StockAnalyst.Api/        # ASP.NET Core 10 Web API
+│   └── StockAnalyst.Web/        # ASP.NET Core Blazor frontend
 ├── tests/
 │   ├── StockAnalyst.Core.Tests/ # xUnit unit tests for Core
 │   └── StockAnalyst.Api.Tests/  # xUnit integration tests for API
-├── client/
-│   ├── src/                     # JavaScript source
-│   └── tests/                   # Vitest tests
 ├── .specify/                    # Spec Kit configuration & memory
 │   └── memory/constitution.md  # Project principles (start here)
 └── .github/prompts/             # Copilot slash commands
@@ -24,19 +22,11 @@ stock-analyst/
 
 ### Prerequisites
 - [.NET 10 SDK](https://dotnet.microsoft.com/)
-- [Node.js 20+](https://nodejs.org/)
 
 ### Build & Test (.NET)
 ```bash
 dotnet build
 dotnet test
-```
-
-### Build & Test (JavaScript)
-```bash
-cd client
-npm install
-npm test
 ```
 
 ## Spec-Driven Development Workflow
