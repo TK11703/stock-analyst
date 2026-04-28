@@ -8,19 +8,17 @@ All features begin as a specification using `/speckit.specify`. No implementatio
 ### II. Test-Driven Development (NON-NEGOTIABLE)
 Tests are written from the spec before implementation. Follow Red-Green-Refactor strictly:
 - C# (.NET 10): xUnit with tests in `tests/` mirroring `src/` structure.
-- JavaScript: Vitest with tests in `client/tests/`.
 All tests must pass before any feature branch is merged.
 
 ### III. Technology Stack
 - **Backend**: .NET 10, C# — ASP.NET Core Web API (`src/StockAnalyst.Api`), Core business logic (`src/StockAnalyst.Core`).
-- **Frontend**: JavaScript (ES modules) — client in `client/src/`, tested with Vitest.
+- **Frontend**: ASP.NET Core Blazor — Blazor components in `src/StockAnalyst.Web/`.
 - Do not introduce new languages or runtimes without amending this constitution.
 
 ### IV. Code Quality
 - Keep interfaces small and focused (interface segregation).
 - No business logic in API controllers — delegate to services in `StockAnalyst.Core`.
-- JavaScript modules must be ES module (`"type": "module"`) with explicit exports.
-- All public APIs (C# and JS) must have XML/JSDoc documentation.
+- All public APIs (C#) must have XML documentation.
 
 ### V. Simplicity (YAGNI)
 Start with the simplest design that satisfies the spec. Avoid over-engineering. Complexity must be justified by a spec requirement.
@@ -33,10 +31,9 @@ Start with the simplest design that satisfies the spec. Avoid over-engineering. 
 - Dependency injection via `Microsoft.Extensions.DependencyInjection`
 - No third-party ORM until a spec requires persistent storage
 
-### JavaScript
-- Runtime: Node.js 20+ (ES2022+)
-- Test framework: Vitest
-- No UI framework until a spec requires it
+### Blazor / Frontend
+- Framework: ASP.NET Core Blazor (`src/StockAnalyst.Web/`)
+- No JavaScript frameworks or runtimes
 
 ## Development Workflow
 
