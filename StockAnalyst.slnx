@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StockAnalyst.Api/StockAnalyst.Api.csproj" />
+    <Project Path="src/StockAnalyst.Core/StockAnalyst.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/StockAnalyst.Api.Tests/StockAnalyst.Api.Tests.csproj" />
+    <Project Path="tests/StockAnalyst.Core.Tests/StockAnalyst.Core.Tests.csproj" />
+  </Folder>
+</Solution>
