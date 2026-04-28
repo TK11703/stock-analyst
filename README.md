@@ -1,1 +1,1 @@
-# stock-analyst
+# Stock Analyst
