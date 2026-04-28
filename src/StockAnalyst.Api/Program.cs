@@ -75,6 +75,9 @@ app.MapPost("/api/stocks", async (CreateStockRequest request, IStockService stoc
 
 app.Run();
 
+// Expose Program for WebApplicationFactory in integration tests
+public partial class Program { }
+
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);

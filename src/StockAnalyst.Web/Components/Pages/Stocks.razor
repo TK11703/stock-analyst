@@ -108,12 +108,19 @@ else
                 <li class="page-item @(_currentPage <= 1 ? "disabled" : "")">
                     <button class="page-link" @onclick="PreviousPage" disabled="@(_currentPage <= 1)">Previous</button>
                 </li>
-                @for (int p = 1; p <= _pagedResult.TotalPages; p++)
+                @foreach (var pageEntry in GetPageEntries(_pagedResult.TotalPages, _currentPage))
                 {
-                    var pageNum = p;
-                    <li class="page-item @(pageNum == _currentPage ? "active" : "")">
-                        <button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
-                    </li>
+                    if (pageEntry == -1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    }
+                    else
+                    {
+                        var pageNum = pageEntry;
+                        <li class="page-item @(pageNum == _currentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(pageNum)">@pageNum</button>
+                        </li>
+                    }
                 }
                 <li class="page-item @(_currentPage >= _pagedResult.TotalPages ? "disabled" : "")">
                     <button class="page-link" @onclick="NextPage" disabled="@(_currentPage >= _pagedResult.TotalPages)">Next</button>
@@ -217,6 +224,32 @@ else
         finally
         {
             _isSubmitting = false;
+        }
+    }
+
+    /// <summary>
+    /// Returns page numbers to display with -1 as an ellipsis placeholder.
+    /// Always shows first page, last page, and up to 2 pages around the current page.
+    /// </summary>
+    private static IEnumerable<int> GetPageEntries(int totalPages, int currentPage)
+    {
+        if (totalPages <= 7)
+        {
+            for (int i = 1; i <= totalPages; i++) yield return i;
+            yield break;
+        }
+
+        var pages = new SortedSet<int> { 1, totalPages };
+        for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
+            pages.Add(i);
+
+        int prev = 0;
+        foreach (var p in pages)
+        {
+            if (prev != 0 && p > prev + 1)
+                yield return -1; // ellipsis
+            yield return p;
+            prev = p;
         }
     }
 }
