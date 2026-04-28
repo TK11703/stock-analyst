@@ -55,3 +55,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Node / JavaScript
+client/node_modules/
+client/.vitest-cache/
+client/coverage/
+
