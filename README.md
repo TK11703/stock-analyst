@@ -31,13 +31,21 @@ dotnet test
 
 ## Spec-Driven Development Workflow
 
-This project uses [GitHub Spec Kit](https://github.com/github/spec-kit). Use these Copilot slash commands in order:
+This project uses [GitHub Spec Kit](https://github.com/github/spec-kit). All features start as a spec file in `specs/` before any code is written.
+
+Quick start — Copilot slash commands (in order):
 
 1. `/speckit.constitution` — Review or amend project principles
-2. `/speckit.specify` — Describe what you want to build
+2. `/speckit.specify` — Describe what you want to build (creates `specs/<feature>.md`)
 3. `/speckit.plan` — Define the technical approach
 4. `/speckit.tasks` — Break the plan into actionable tasks
 5. `/speckit.implement` — Execute implementation
+
+You can also use the dedicated prompt files directly:
+- `.github/prompts/feature-spec.prompt.md` — generate a spec for any feature
+- `.github/prompts/feature-plan.prompt.md` — turn a spec into an implementation plan
+
+See **[SPECS.md](SPECS.md)** for detailed instructions on using specs across GitHub.com Chat, Agent chat, and VS Code.
 
 See `.specify/memory/constitution.md` for the project's governing principles.
 
