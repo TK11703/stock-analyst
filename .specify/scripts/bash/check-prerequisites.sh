@@ -112,15 +112,15 @@ if $PATHS_ONLY; then
     exit 0
 fi
 
-# Validate required directories and files
-if [[ ! -d "$FEATURE_DIR" ]]; then
-    echo "ERROR: Feature directory not found: $FEATURE_DIR" >&2
-    echo "Run /speckit.specify first to create the feature structure." >&2
+# Validate required spec file and plan
+if [[ ! -f "$FEATURE_SPEC" ]]; then
+    echo "ERROR: Feature spec not found: $FEATURE_SPEC" >&2
+    echo "Run /speckit.specify first to create the feature spec." >&2
     exit 1
 fi
 
 if [[ ! -f "$IMPL_PLAN" ]]; then
-    echo "ERROR: plan.md not found in $FEATURE_DIR" >&2
+    echo "ERROR: plan not found: $IMPL_PLAN" >&2
     echo "Run /speckit.plan first to create the implementation plan." >&2
     exit 1
 fi

@@ -60,33 +60,32 @@ get_current_branch() {
         return
     fi
 
-    # For non-git repos, try to find the latest feature directory
-    local specs_dir="$repo_root/specs"
+    # For non-git repos, try to find the latest feature from .specify/specs/ flat files
+    local specs_dir="$repo_root/.specify/specs"
 
     if [[ -d "$specs_dir" ]]; then
         local latest_feature=""
         local highest=0
         local latest_timestamp=""
 
-        for dir in "$specs_dir"/*; do
-            if [[ -d "$dir" ]]; then
-                local dirname=$(basename "$dir")
-                if [[ "$dirname" =~ ^([0-9]{8}-[0-9]{6})- ]]; then
-                    # Timestamp-based branch: compare lexicographically
-                    local ts="${BASH_REMATCH[1]}"
-                    if [[ "$ts" > "$latest_timestamp" ]]; then
-                        latest_timestamp="$ts"
-                        latest_feature=$dirname
-                    fi
-                elif [[ "$dirname" =~ ^([0-9]{3,})- ]]; then
-                    local number=${BASH_REMATCH[1]}
-                    number=$((10#$number))
-                    if [[ "$number" -gt "$highest" ]]; then
-                        highest=$number
-                        # Only update if no timestamp branch found yet
-                        if [[ -z "$latest_timestamp" ]]; then
-                            latest_feature=$dirname
-                        fi
+        for f in "$specs_dir"/*.md; do
+            [[ -f "$f" ]] || continue
+            local filename=$(basename "$f" .md)
+            if [[ "$filename" =~ ^([0-9]{8}-[0-9]{6})- ]]; then
+                # Timestamp-based: compare lexicographically
+                local ts="${BASH_REMATCH[1]}"
+                if [[ "$ts" > "$latest_timestamp" ]]; then
+                    latest_timestamp="$ts"
+                    latest_feature=$filename
+                fi
+            elif [[ "$filename" =~ ^([0-9]{3,})- ]]; then
+                local number=${BASH_REMATCH[1]}
+                number=$((10#$number))
+                if [[ "$number" -gt "$highest" ]]; then
+                    highest=$number
+                    # Only update if no timestamp branch found yet
+                    if [[ -z "$latest_timestamp" ]]; then
+                        latest_feature=$filename
                     fi
                 fi
             fi
@@ -185,9 +184,9 @@ read_feature_json_feature_directory() {
     return 0
 }
 
-# Returns 0 when .specify/feature.json lists feature_directory that exists as a directory
+# Returns 0 when .specify/feature.json lists a feature_directory that exists
 # and matches the resolved active FEATURE_DIR (so /speckit.plan can skip git branch pattern checks).
-# Delegates parsing to read_feature_json_feature_directory, which is safe under `set -e`.
+# Supports both legacy directory paths and new-style spec file paths.
 feature_json_matches_feature_dir() {
     local repo_root="$1"
     local active_feature_dir="$2"
@@ -197,6 +196,13 @@ feature_json_matches_feature_dir() {
 
     [[ -n "$_fd" ]] || return 1
     [[ "$_fd" != /* ]] && _fd="$repo_root/$_fd"
+
+    # New mode: feature.json stores a spec file path — any valid file is a match
+    if [[ -f "$_fd" ]]; then
+        return 0
+    fi
+
+    # Legacy mode: feature.json stores a directory path — compare directories
     [[ -d "$_fd" ]] || return 1
 
     local norm_json norm_active
@@ -206,47 +212,45 @@ feature_json_matches_feature_dir() {
     [[ "$norm_json" == "$norm_active" ]]
 }
 
-# Find feature directory by numeric prefix instead of exact branch match
-# This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Find feature spec file by numeric prefix from .specify/specs/
+# This allows multiple branches to work on the same spec (e.g., 0004-fix-bug, 0004-add-feature)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name
     branch_name=$(spec_kit_effective_branch_name "$2")
-    local specs_dir="$repo_root/specs"
+    local specs_dir="$repo_root/.specify/specs"
 
-    # Extract prefix from branch (e.g., "004" from "004-whatever" or "20260319-143022" from timestamp branches)
+    # Extract prefix from branch (e.g., "0004" from "0004-whatever" or "20260319-143022" from timestamp branches)
     local prefix=""
     if [[ "$branch_name" =~ ^([0-9]{8}-[0-9]{6})- ]]; then
         prefix="${BASH_REMATCH[1]}"
     elif [[ "$branch_name" =~ ^([0-9]{3,})- ]]; then
         prefix="${BASH_REMATCH[1]}"
     else
-        # If branch doesn't have a recognized prefix, fall back to exact match
-        echo "$specs_dir/$branch_name"
+        # If branch doesn't have a recognized prefix, fall back to expected path
+        echo "$specs_dir/$branch_name.md"
         return
     fi
 
-    # Search for directories in specs/ that start with this prefix
+    # Search for spec files in .specify/specs/ that start with this prefix
     local matches=()
     if [[ -d "$specs_dir" ]]; then
-        for dir in "$specs_dir"/"$prefix"-*; do
-            if [[ -d "$dir" ]]; then
-                matches+=("$(basename "$dir")")
-            fi
+        for f in "$specs_dir"/"$prefix"-*.md; do
+            [[ -f "$f" ]] && matches+=("$f")
         done
     fi
 
     # Handle results
     if [[ ${#matches[@]} -eq 0 ]]; then
-        # No match found - return the branch name path (will fail later with clear error)
-        echo "$specs_dir/$branch_name"
+        # No match found - return the expected spec file path (will fail later with clear error)
+        echo "$specs_dir/$branch_name.md"
     elif [[ ${#matches[@]} -eq 1 ]]; then
         # Exactly one match - perfect!
-        echo "$specs_dir/${matches[0]}"
+        echo "${matches[0]}"
     else
         # Multiple matches - this shouldn't happen with proper naming convention
-        echo "ERROR: Multiple spec directories found with prefix '$prefix': ${matches[*]}" >&2
-        echo "Please ensure only one spec directory exists per prefix." >&2
+        echo "ERROR: Multiple spec files found with prefix '$prefix': ${matches[*]}" >&2
+        echo "Please ensure only one spec file exists per prefix." >&2
         return 1
     fi
 }
@@ -260,46 +264,52 @@ get_feature_paths() {
         has_git_repo="true"
     fi
 
-    # Resolve feature directory.  Priority:
-    #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override)
+    # Resolve the spec file path. Priority:
+    #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override — may be a spec file path or feature id)
     #   2. .specify/feature.json "feature_directory" key (persisted by /speckit.specify)
-    #   3. Branch-name-based prefix lookup (legacy fallback)
-    local feature_dir
+    #   3. Branch-name-based prefix lookup in .specify/specs/ (default)
+    local feature_spec_path
     if [[ -n "${SPECIFY_FEATURE_DIRECTORY:-}" ]]; then
-        feature_dir="$SPECIFY_FEATURE_DIRECTORY"
+        feature_spec_path="$SPECIFY_FEATURE_DIRECTORY"
         # Normalize relative paths to absolute under repo root
-        [[ "$feature_dir" != /* ]] && feature_dir="$repo_root/$feature_dir"
+        [[ "$feature_spec_path" != /* ]] && feature_spec_path="$repo_root/$feature_spec_path"
     elif [[ -f "$repo_root/.specify/feature.json" ]]; then
         # Shared, set -e-safe parser: jq -> python3 -> grep/sed. Returns empty on
         # missing/unparseable/unset so we fall through to the branch-prefix lookup.
         local _fd
         _fd=$(read_feature_json_feature_directory "$repo_root")
         if [[ -n "$_fd" ]]; then
-            feature_dir="$_fd"
+            feature_spec_path="$_fd"
             # Normalize relative paths to absolute under repo root
-            [[ "$feature_dir" != /* ]] && feature_dir="$repo_root/$feature_dir"
-        elif ! feature_dir=$(find_feature_dir_by_prefix "$repo_root" "$current_branch"); then
-            echo "ERROR: Failed to resolve feature directory" >&2
+            [[ "$feature_spec_path" != /* ]] && feature_spec_path="$repo_root/$feature_spec_path"
+        elif ! feature_spec_path=$(find_feature_dir_by_prefix "$repo_root" "$current_branch"); then
+            echo "ERROR: Failed to resolve feature spec path" >&2
             return 1
         fi
-    elif ! feature_dir=$(find_feature_dir_by_prefix "$repo_root" "$current_branch"); then
-        echo "ERROR: Failed to resolve feature directory" >&2
+    elif ! feature_spec_path=$(find_feature_dir_by_prefix "$repo_root" "$current_branch"); then
+        echo "ERROR: Failed to resolve feature spec path" >&2
         return 1
     fi
+
+    # Derive feature_id from the spec file name (e.g., "0001-FeatureName" from ".specify/specs/0001-FeatureName.md")
+    local feature_id
+    feature_id=$(basename "$feature_spec_path" .md)
+
+    local specify_dir="$repo_root/.specify"
 
     # Use printf '%q' to safely quote values, preventing shell injection
     # via crafted branch names or paths containing special characters
     printf 'REPO_ROOT=%q\n' "$repo_root"
     printf 'CURRENT_BRANCH=%q\n' "$current_branch"
     printf 'HAS_GIT=%q\n' "$has_git_repo"
-    printf 'FEATURE_DIR=%q\n' "$feature_dir"
-    printf 'FEATURE_SPEC=%q\n' "$feature_dir/spec.md"
-    printf 'IMPL_PLAN=%q\n' "$feature_dir/plan.md"
-    printf 'TASKS=%q\n' "$feature_dir/tasks.md"
-    printf 'RESEARCH=%q\n' "$feature_dir/research.md"
-    printf 'DATA_MODEL=%q\n' "$feature_dir/data-model.md"
-    printf 'QUICKSTART=%q\n' "$feature_dir/quickstart.md"
-    printf 'CONTRACTS_DIR=%q\n' "$feature_dir/contracts"
+    printf 'FEATURE_DIR=%q\n' "$specify_dir"
+    printf 'FEATURE_SPEC=%q\n' "$specify_dir/specs/$feature_id.md"
+    printf 'IMPL_PLAN=%q\n' "$specify_dir/plans/$feature_id.md"
+    printf 'TASKS=%q\n' "$specify_dir/tasks/$feature_id.md"
+    printf 'RESEARCH=%q\n' "$specify_dir/research/$feature_id.md"
+    printf 'DATA_MODEL=%q\n' "$specify_dir/data-models/$feature_id.md"
+    printf 'QUICKSTART=%q\n' "$specify_dir/quickstarts/$feature_id.md"
+    printf 'CONTRACTS_DIR=%q\n' "$specify_dir/contracts/$feature_id"
 }
 
 # Check if jq is available for safe JSON construction
