@@ -1,7 +1,7 @@
 # Implementation Plan: [FEATURE]
 
-**Branch**: `[NNNN-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `.specify/specs/[NNNN-FeatureName].md`
+**Branch**: `[NNNN-kebab-case-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `.specify/specs/[NNNN-kebab-case-name].md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
 
@@ -39,13 +39,13 @@
 
 ```text
 .specify/
-├── specs/[NNNN-FeatureName].md      # Spec file (/speckit.specify command output)
-├── plans/[NNNN-FeatureName].md      # This file (/speckit.plan command output)
-├── research/[NNNN-FeatureName].md   # Phase 0 output (/speckit.plan command)
-├── data-models/[NNNN-FeatureName].md  # Phase 1 output (/speckit.plan command)
-├── quickstarts/[NNNN-FeatureName].md  # Phase 1 output (/speckit.plan command)
-├── contracts/[NNNN-FeatureName]/    # Phase 1 output (/speckit.plan command)
-└── tasks/[NNNN-FeatureName].md      # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+├── specs/[NNNN-kebab-case-name].md      # Spec file (/speckit.specify command output)
+├── plans/[NNNN-kebab-case-name].md      # This file (/speckit.plan command output)
+├── research/[NNNN-kebab-case-name].md   # Phase 0 output (/speckit.plan command)
+├── data-models/[NNNN-kebab-case-name].md  # Phase 1 output (/speckit.plan command)
+├── quickstarts/[NNNN-kebab-case-name].md  # Phase 1 output (/speckit.plan command)
+├── contracts/[NNNN-kebab-case-name]/    # Phase 1 output (/speckit.plan command)
+└── tasks/[NNNN-kebab-case-name].md      # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
