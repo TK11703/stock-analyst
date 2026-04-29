@@ -53,7 +53,7 @@ if [[ -n "$FEATURE_ID" ]]; then
     _resolved_spec=""
 
     # Try glob: match FEATURE_ID as a prefix (e.g. "0001" matches "0001-remove-weather.md")
-    for _f in "$_specs_dir"/${FEATURE_ID}*.md; do
+    for _f in "$_specs_dir/${FEATURE_ID}"*.md; do
         if [[ -f "$_f" ]]; then
             _resolved_spec="$_f"
             break
