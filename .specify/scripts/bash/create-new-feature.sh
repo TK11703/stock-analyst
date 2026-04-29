@@ -90,18 +90,18 @@ if [ -z "$FEATURE_DESCRIPTION" ]; then
     exit 1
 fi
 
-# Function to get highest number from specs directory
+# Function to get highest number from specs directory (flat .md files)
 get_highest_from_specs() {
     local specs_dir="$1"
     local highest=0
     
     if [ -d "$specs_dir" ]; then
-        for dir in "$specs_dir"/*; do
-            [ -d "$dir" ] || continue
-            dirname=$(basename "$dir")
-            # Match sequential prefixes (>=3 digits), but skip timestamp dirs.
-            if echo "$dirname" | grep -Eq '^[0-9]{3,}-' && ! echo "$dirname" | grep -Eq '^[0-9]{8}-[0-9]{6}-'; then
-                number=$(echo "$dirname" | grep -Eo '^[0-9]+')
+        for f in "$specs_dir"/*.md; do
+            [ -f "$f" ] || continue
+            filename=$(basename "$f" .md)
+            # Match sequential prefixes (>=3 digits), but skip timestamp files.
+            if echo "$filename" | grep -Eq '^[0-9]{3,}-' && ! echo "$filename" | grep -Eq '^[0-9]{8}-[0-9]{6}-'; then
+                number=$(echo "$filename" | grep -Eo '^[0-9]+')
                 number=$((10#$number))
                 if [ "$number" -gt "$highest" ]; then
                     highest=$number
@@ -111,6 +111,39 @@ get_highest_from_specs() {
     fi
     
     echo "$highest"
+}
+
+# Function to convert a description to PascalCase for file naming
+to_pascal_case() {
+    local description="$1"
+    local stop_words="^(i|a|an|the|to|for|of|in|on|at|by|with|from|is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|should|could|can|may|might|must|shall|this|that|these|those|my|your|our|their|want|need|add|get|set)$"
+
+    local clean_name
+    clean_name=$(echo "$description" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/ /g')
+
+    local result=""
+    for word in $clean_name; do
+        [ -z "$word" ] && continue
+        # Skip stop words
+        if echo "$word" | grep -qiE "$stop_words"; then
+            continue
+        fi
+        # Skip single-character tokens
+        if [ ${#word} -lt 2 ]; then
+            continue
+        fi
+        # Capitalize first letter (portable: awk)
+        local capitalized
+        capitalized=$(echo "$word" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')
+        result="${result}${capitalized}"
+    done
+
+    # Fallback: if nothing resulted, use cleaned full description
+    if [ -z "$result" ]; then
+        result=$(echo "$description" | sed 's/[^a-zA-Z0-9 ]/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}' | tr -d ' ')
+    fi
+
+    echo "$result"
 }
 
 # Function to get highest number from git branches
@@ -203,7 +236,7 @@ fi
 
 cd "$REPO_ROOT"
 
-SPECS_DIR="$REPO_ROOT/specs"
+SPECS_DIR="$REPO_ROOT/.specify/specs"
 if [ "$DRY_RUN" != true ]; then
     mkdir -p "$SPECS_DIR"
 fi
@@ -256,13 +289,15 @@ generate_branch_name() {
     fi
 }
 
-# Generate branch name
+# Generate branch name (kebab-case, for git) and PascalCase name (for file naming)
 if [ -n "$SHORT_NAME" ]; then
     # Use provided short name, just clean it up
     BRANCH_SUFFIX=$(clean_branch_name "$SHORT_NAME")
+    PASCAL_NAME=$(to_pascal_case "$SHORT_NAME")
 else
     # Generate from description with smart filtering
     BRANCH_SUFFIX=$(generate_branch_name "$FEATURE_DESCRIPTION")
+    PASCAL_NAME=$(to_pascal_case "$FEATURE_DESCRIPTION")
 fi
 
 # Warn if --number and --timestamp are both specified
@@ -296,7 +331,7 @@ else
     fi
 
     # Force base-10 interpretation to prevent octal conversion (e.g., 010 → 8 in octal, but should be 10 in decimal)
-    FEATURE_NUM=$(printf "%03d" "$((10#$BRANCH_NUMBER))")
+    FEATURE_NUM=$(printf "%04d" "$((10#$BRANCH_NUMBER))")
     BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
 fi
 
@@ -322,8 +357,7 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
-SPEC_FILE="$FEATURE_DIR/spec.md"
+SPEC_FILE="$SPECS_DIR/${FEATURE_NUM}-${PASCAL_NAME}.md"
 
 if [ "$DRY_RUN" != true ]; then
     if [ "$HAS_GIT" = true ]; then
@@ -365,7 +399,7 @@ if [ "$DRY_RUN" != true ]; then
         >&2 echo "[specify] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
     fi
 
-    mkdir -p "$FEATURE_DIR"
+    mkdir -p "$SPECS_DIR"
 
     if [ ! -f "$SPEC_FILE" ]; then
         TEMPLATE=$(resolve_template "spec-template" "$REPO_ROOT") || true
@@ -388,25 +422,28 @@ if $JSON_MODE; then
                 --arg branch_name "$BRANCH_NAME" \
                 --arg spec_file "$SPEC_FILE" \
                 --arg feature_num "$FEATURE_NUM" \
-                '{BRANCH_NAME:$branch_name,SPEC_FILE:$spec_file,FEATURE_NUM:$feature_num,DRY_RUN:true}'
+                --arg pascal_name "$PASCAL_NAME" \
+                '{BRANCH_NAME:$branch_name,SPEC_FILE:$spec_file,FEATURE_NUM:$feature_num,PASCAL_NAME:$pascal_name,DRY_RUN:true}'
         else
             jq -cn \
                 --arg branch_name "$BRANCH_NAME" \
                 --arg spec_file "$SPEC_FILE" \
                 --arg feature_num "$FEATURE_NUM" \
-                '{BRANCH_NAME:$branch_name,SPEC_FILE:$spec_file,FEATURE_NUM:$feature_num}'
+                --arg pascal_name "$PASCAL_NAME" \
+                '{BRANCH_NAME:$branch_name,SPEC_FILE:$spec_file,FEATURE_NUM:$feature_num,PASCAL_NAME:$pascal_name}'
         fi
     else
         if [ "$DRY_RUN" = true ]; then
-            printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","DRY_RUN":true}\n' "$(json_escape "$BRANCH_NAME")" "$(json_escape "$SPEC_FILE")" "$(json_escape "$FEATURE_NUM")"
+            printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","PASCAL_NAME":"%s","DRY_RUN":true}\n' "$(json_escape "$BRANCH_NAME")" "$(json_escape "$SPEC_FILE")" "$(json_escape "$FEATURE_NUM")" "$(json_escape "$PASCAL_NAME")"
         else
-            printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' "$(json_escape "$BRANCH_NAME")" "$(json_escape "$SPEC_FILE")" "$(json_escape "$FEATURE_NUM")"
+            printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","PASCAL_NAME":"%s"}\n' "$(json_escape "$BRANCH_NAME")" "$(json_escape "$SPEC_FILE")" "$(json_escape "$FEATURE_NUM")" "$(json_escape "$PASCAL_NAME")"
         fi
     fi
 else
     echo "BRANCH_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"
+    echo "PASCAL_NAME: $PASCAL_NAME"
     if [ "$DRY_RUN" != true ]; then
         printf '# To persist in your shell: export SPECIFY_FEATURE=%q\n' "$BRANCH_NAME"
     fi

@@ -12,19 +12,33 @@ This repository follows a **spec-first** approach. Every new feature begins as a
 **Always** follow these steps in order:
 
 1. **Ask clarifying questions** (if the feature description is ambiguous or underspecified). Keep questions concise and targeted — ask up to 5 questions at once, then proceed.
-2. **Create or update a spec file** at `specs/<kebab-case-feature-name>.md` using the template below.
+2. **Create or update a spec file** at `.specify/specs/NNNN-PascalCaseFeatureName.md` using the template below.
 3. **Use the spec as the source of truth** — all subsequent plans, tasks, and implementation must trace back to the spec.
 4. **Acknowledge if a spec already exists** at that path, and offer to update it or create a new version rather than overwriting silently.
 
 ### Spec filename conventions
 
-- Path: `specs/<kebab-case-feature>.md`
-- Use lowercase, hyphen-separated words derived from the feature name.
-- Examples:
-  - "Stock price alerts" → `specs/stock-price-alerts.md`
-  - "User authentication" → `specs/user-authentication.md`
-  - "Portfolio dashboard" → `specs/portfolio-dashboard.md`
-- If the user provides a ticket/issue number prefix, include it: `specs/42-stock-price-alerts.md`
+All speckit artifacts are stored under `.specify/` in type-specific subdirectories. Each feature is identified by a unique **`NNNN`** — a 4-digit zero-padded sequential integer (e.g., `0001`, `0042`) that is **never reused**.
+
+| Artifact   | Path                                              |
+|------------|---------------------------------------------------|
+| Spec       | `.specify/specs/NNNN-PascalCaseName.md`           |
+| Plan       | `.specify/plans/NNNN-PascalCaseName.md`           |
+| Tasks      | `.specify/tasks/NNNN-PascalCaseName.md`           |
+| Research   | `.specify/research/NNNN-PascalCaseName.md`        |
+| Data Model | `.specify/data-models/NNNN-PascalCaseName.md`     |
+| Quickstart | `.specify/quickstarts/NNNN-PascalCaseName.md`     |
+| Contracts  | `.specify/contracts/NNNN-PascalCaseName/`         |
+
+**Naming rules**:
+- `NNNN` is determined by incrementing the highest existing number across all specs, git branches, and remote branches. It must be unique across the entire repo history.
+- `PascalCaseName` is derived from the feature description with stop words removed and each meaningful word capitalized (e.g., "create a new feature" → `CreateNewFeature`).
+- Git branches use `NNNN-kebab-case-name` format (e.g., `0001-create-new-feature`).
+
+**Examples**:
+- "Stock price alerts" → `.specify/specs/0001-StockPriceAlerts.md`
+- "User authentication" → `.specify/specs/0002-UserAuthentication.md`
+- "Portfolio dashboard" → `.specify/specs/0003-PortfolioDashboard.md`
 
 ### Spec file template
 
@@ -33,7 +47,7 @@ When creating a spec, always use this structure:
 ```markdown
 # Feature Specification: <Feature Name>
 
-**File**: `specs/<kebab-case-feature>.md`
+**File**: `.specify/specs/<NNNN-PascalCaseName>.md`
 **Created**: <YYYY-MM-DD>
 **Status**: Draft | In Review | Approved
 
@@ -82,8 +96,8 @@ When creating a spec, always use this structure:
 
 **GitHub.com Copilot Chat (no direct file writes)**
 - Output the full spec as a fenced markdown file block labelled with the target path.
-- Follow it with instructions: "Save this as `specs/<kebab-case-feature>.md` in the repository, then commit it."
-- Example file block opening: ` ```markdown name=specs/my-feature.md `
+- Follow it with instructions: "Save this as `.specify/specs/<NNNN-PascalCaseName>.md` in the repository, then commit it."
+- Example file block opening: ` ```markdown name=.specify/specs/0001-MyFeature.md `
 
 **VS Code Copilot Chat**
 - Offer to create the file directly in the workspace using the file creation capability.
