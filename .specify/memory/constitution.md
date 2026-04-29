@@ -39,7 +39,12 @@ Start with the simplest design that satisfies the spec. Avoid over-engineering. 
 
 1. Run `/speckit.constitution` to review/amend principles.
 2. Run `/speckit.specify` to describe the feature.
-3. Run `/speckit.plan` with stack and architecture decisions.
+   - **After the spec file is created**, the agent MUST:
+     a. Create a dedicated `spec/<feature-name>` branch.
+     b. Commit the spec file under `specs/` to that branch.
+     c. Open a Pull Request titled `Spec: <Feature Name>` (draft is acceptable).
+     d. Include a review request in the PR description asking stakeholders to approve the spec before planning begins.
+3. Run `/speckit.plan` with stack and architecture decisions — only after the spec PR is approved.
 4. Run `/speckit.tasks` to generate actionable tasks.
 5. Write tests (failing) before implementation.
 6. Implement until all tests pass.
@@ -48,5 +53,10 @@ Start with the simplest design that satisfies the spec. Avoid over-engineering. 
 ## Governance
 This constitution supersedes all other practices. Amendments require an updated spec entry and team review. All PRs must verify compliance with these principles.
 
-**Version**: 1.0.0 | **Ratified**: 2026-04-28 | **Last Amended**: 2026-04-28
+**Version**: 1.1.0 | **Ratified**: 2026-04-28 | **Last Amended**: 2026-04-29
+
+## Change History
+
+### v1.1.0 — 2026-04-29
+- **Development Workflow**: Added mandatory PR creation and review-request steps after spec file creation. Every spec must now be committed on a dedicated `spec/<feature-name>` branch and submitted as a Pull Request before planning proceeds.
 

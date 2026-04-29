@@ -90,8 +90,18 @@ When creating a spec, always use this structure:
 - Confirm the filename with the user before writing.
 
 **GitHub Copilot Agent / Coding Agent (automated context)**
-- Create the spec file directly at `specs/<kebab-case-feature>.md` without asking for confirmation.
-- Report the created file path in the response.
+
+Follow these steps **in order** every time a spec is created or updated:
+
+1. **Create a feature branch** named `spec/<kebab-case-feature-name>` (e.g., `spec/stock-price-alerts`).
+2. **Create the spec file** at `specs/<kebab-case-feature>.md` on that branch using the template below.
+3. **Commit and push** the spec file to the feature branch with a commit message like `docs: add spec for <feature name>`.
+4. **Open a Pull Request** (draft is fine) with:
+   - Title: `Spec: <Feature Name>`
+   - Description summarising the feature and listing the spec's acceptance criteria.
+   - Label or note that this PR is awaiting spec review before planning begins.
+5. **Request a review** — mention in the PR description: "Please review and approve this spec before planning and implementation proceed."
+6. Report the spec file path and the PR URL in your response.
 
 ### Keeping plans in sync with specs
 
