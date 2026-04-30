@@ -168,10 +168,19 @@ Follow these steps **in order** every time a spec is created or updated:
 - `/speckit.tasks 0001`
 - `/speckit.tasks 0001-remove-weather-sample-code`
 
+> **Important — act immediately, no additional context required.**
+> A feature argument like `0001` is the numeric prefix of a spec file stored in `.specify/specs/`
+> (e.g., `0001` → `.specify/specs/0001-remove-weather-sample-code.md`).
+> Run `setup-tasks.sh` as the very first action — it resolves the full paths for you.
+> Do **not** ask the user for context, file contents, or confirmation before starting.
+
 **Steps (GitHub Copilot Agent / Coding Agent)**:
 
 1. **Extract the feature ID** from the user's input (e.g., `0001` or `0001-remove-weather-sample-code`).
-2. **Run `setup-tasks.sh`** to resolve paths and scaffold the tasks file:
+   - If the argument looks like a free-text description rather than a numeric ID (e.g., from a workflow
+     where the spec description is passed as args), scan `.specify/specs/` to find the most recently
+     created spec file and use its numeric prefix as the feature ID.
+2. **Run `setup-tasks.sh`** using your bash tool to scaffold the tasks file and resolve all artifact paths:
    ```bash
    bash .specify/scripts/bash/setup-tasks.sh --json --feature <feature-id>
    ```
@@ -179,7 +188,7 @@ Follow these steps **in order** every time a spec is created or updated:
    - `FEATURE_SPEC` — absolute path to the spec file (e.g., `.specify/specs/0001-remove-weather-sample-code.md`)
    - `IMPL_PLAN` — absolute path to the plan file (e.g., `.specify/plans/0001-remove-weather-sample-code.md`)
    - `TASKS` — absolute path where the tasks file should be written (e.g., `.specify/tasks/0001-remove-weather-sample-code.md`)
-3. **Read the spec and plan** files at `FEATURE_SPEC` and `IMPL_PLAN`. Also read any supporting artifacts (research, data-model, contracts) if they exist.
+3. **Read the spec and plan** files at `FEATURE_SPEC` and `IMPL_PLAN` using your file-read tool. Also read any supporting artifacts (research, data-model, contracts) if they exist under `.specify/`.
 4. **Write the task list** to `TASKS` (the template is already copied there by `setup-tasks.sh`). Replace all sample tasks with real tasks:
    - Replace all sample tasks with real tasks derived from the spec's user stories and the plan's implementation phases.
    - Group tasks by user story; include phase headers.

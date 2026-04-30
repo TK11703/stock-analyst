@@ -54,7 +54,7 @@ steps:
     command: speckit.tasks
     integration: "{{ inputs.integration }}"
     input:
-      args: "{{ inputs.spec }}"
+      args: "latest"
 
   - id: implement
     command: speckit.implement
