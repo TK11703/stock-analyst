@@ -170,24 +170,32 @@ Follow these steps **in order** every time a spec is created or updated:
 
 **Steps (GitHub Copilot Agent / Coding Agent)**:
 
-1. **Extract the feature ID** from the user's input.
-2. **Resolve artifact paths** using the `NNNN-kebab-case-name` pattern:
-   - Spec: `.specify/specs/<NNNN>-*.md`
-   - Plan: `.specify/plans/<NNNN>-*.md`
-   - Tasks output: `.specify/tasks/<NNNN>-kebab-case-name.md`
-   - Use the same kebab-case suffix already on the spec/plan files.
-3. **Read the spec and plan** files. Also read any supporting artifacts (research, data-model, contracts) if they exist.
-4. **Generate the task list** at `.specify/tasks/<NNNN>-kebab-case-name.md` using the tasks template (`.specify/templates/tasks-template.md`) as structure guidance:
+1. **Extract the feature ID** from the user's input (e.g., `0001` or `0001-remove-weather-sample-code`).
+2. **Run `setup-tasks.sh`** to resolve paths and scaffold the tasks file:
+   ```bash
+   bash .specify/scripts/bash/setup-tasks.sh --json --feature <feature-id>
+   ```
+   Parse the JSON output — the keys you need are:
+   - `FEATURE_SPEC` — absolute path to the spec file (e.g., `.specify/specs/0001-remove-weather-sample-code.md`)
+   - `IMPL_PLAN` — absolute path to the plan file (e.g., `.specify/plans/0001-remove-weather-sample-code.md`)
+   - `TASKS` — absolute path where the tasks file should be written (e.g., `.specify/tasks/0001-remove-weather-sample-code.md`)
+3. **Read the spec and plan** files at `FEATURE_SPEC` and `IMPL_PLAN`. Also read any supporting artifacts (research, data-model, contracts) if they exist.
+4. **Write the task list** to `TASKS` (the template is already copied there by `setup-tasks.sh`). Replace all sample tasks with real tasks:
    - Replace all sample tasks with real tasks derived from the spec's user stories and the plan's implementation phases.
    - Group tasks by user story; include phase headers.
    - Mark independent tasks with `[P]`.
    - Include exact file paths in each task description.
 5. **Commit and push** the new tasks file with a message like `docs: add tasks for <feature-name>`.
-6. Report the tasks file path and the total task count.
+6. **Open a Pull Request** (draft is fine) with:
+   - Title: `Tasks: <Feature Name>`
+   - Description summarising the feature and listing the generated tasks.
+   - Note in the PR description that this is the task breakdown awaiting review before implementation begins.
+7. Report the tasks file path, total task count, and PR URL in your response.
 
 **Error handling**:
-- If no feature ID is provided, ask the user which feature to generate tasks for.
-- If the plan file is missing, stop and instruct the user to run `/speckit.plan <id>` first.
+- If no feature ID is provided, ask the user: "Which feature would you like to generate tasks for? Please provide the feature number (e.g., `0001`) or full name."
+- If `setup-tasks.sh` exits non-zero (spec or plan not found), report the error and stop.
+- Do **not** create tasks if the plan file does not exist — instruct the user to run `/speckit.plan <id>` first.
 
 ---
 
