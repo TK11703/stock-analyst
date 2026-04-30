@@ -96,7 +96,7 @@ if [[ -n "$TEMPLATE" ]] && [[ -f "$TEMPLATE" ]]; then
     cp "$TEMPLATE" "$TASKS"
     echo "Copied tasks template to $TASKS"
 else
-    echo "Warning: Tasks template not found"
+    echo "Warning: Tasks template not found at .specify/templates/tasks-template.md"
     # Create a basic tasks file if template doesn't exist
     touch "$TASKS"
 fi
