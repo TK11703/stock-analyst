@@ -18,7 +18,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/stocks",async (
+app.MapGet("/api/stocks", async (
     IStockService stockService,
     int page = 1,
     int pageSize = 20,
