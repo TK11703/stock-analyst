@@ -24,6 +24,7 @@ stock-analyst/
 - [.NET 10 SDK](https://dotnet.microsoft.com/)
 
 ### Build & Test (.NET)
+
 ```bash
 dotnet build
 dotnet test
@@ -45,11 +46,52 @@ All speckit artifacts (specs, plans, tasks, etc.) must include a **4-digit zero-
 
 ### Quick start — Copilot slash commands (in order)
 
+All of the commands below **require a feature ID (`NNNN`)** so Spec Kit knows which artifacts to read and which workstream to continue.
+
 1. `/speckit.constitution` — Review or amend project principles
-2. `/speckit.specify` — Describe what you want to build (creates `.specify/specs/NNNN-kebab-case-name.md`)
-3. `/speckit.plan` — Define the technical approach (creates `.specify/plans/NNNN-kebab-case-name.md`)
-4. `/speckit.tasks` — Break the plan into actionable tasks (creates `.specify/tasks/NNNN-kebab-case-name.md`)
-5. `/speckit.implement` — Execute implementation (works from the `NNNN` feature artifacts)
+2. `/speckit.specify <feature description>` — Describe what you want to build (creates `.specify/specs/NNNN-kebab-case-name.md`)
+3. `/speckit.plan NNNN` — Turn the spec into a technical approach (creates/updates `.specify/plans/NNNN-kebab-case-name.md`)
+4. `/speckit.tasks NNNN` — Break the plan into actionable tasks (creates/updates `.specify/tasks/NNNN-kebab-case-name.md`)
+5. `/speckit.implement NNNN` — Execute implementation for the feature ID (uses `NNNN` spec/plan/tasks as source of truth)
+
+#### Using `/speckit.plan`
+
+- **Input**: `NNNN`
+- **Reads**: `.specify/specs/NNNN-*.md`
+- **Writes**: `.specify/plans/NNNN-*.md`
+- **Purpose**: Converts the spec into an implementation plan (architecture, components, API shapes, data model notes, and test strategy).
+
+Example:
+
+```text
+/speckit.plan 0007
+```
+
+#### Using `/speckit.tasks`
+
+- **Input**: `NNNN`
+- **Reads**: `.specify/plans/NNNN-*.md` (and spec as needed)
+- **Writes**: `.specify/tasks/NNNN-*.md`
+- **Purpose**: Produces an ordered, actionable task list that can be executed incrementally (including testing tasks).
+
+Example:
+
+```text
+/speckit.tasks 0007
+```
+
+#### Using `/speckit.implement`
+
+- **Input**: `NNNN`
+- **Reads**: `.specify/specs/NNNN-*.md`, `.specify/plans/NNNN-*.md`, `.specify/tasks/NNNN-*.md`
+- **Writes**: Code changes under `src/` and `tests/` consistent with the tasks
+- **Purpose**: Implements the feature by following the tasks and staying consistent with the spec and plan.
+
+Example:
+
+```text
+/speckit.implement 0007
+```
 
 ### Prompt files (alternative to slash commands)
 
