@@ -54,6 +54,27 @@ All of the commands below **require a feature ID (`NNNN`)** so Spec Kit knows wh
 4. `/speckit.tasks NNNN` — Break the plan into actionable tasks (creates/updates `.specify/tasks/NNNN-kebab-case-name.md`)
 5. `/speckit.implement NNNN` — Execute implementation for the feature ID (uses `NNNN` spec/plan/tasks as source of truth)
 
+#### Using `/speckit.specify`
+
+- **Input**: A short feature description in plain English (no `NNNN` required)
+- **Writes**: `.specify/specs/NNNN-kebab-case-name.md`
+- **Purpose**: Creates the initial feature specification that becomes the source of truth for planning (`/speckit.plan`), task breakdown (`/speckit.tasks`), and implementation (`/speckit.implement`).
+
+Tips:
+- Keep the description outcome-focused (what users can do) rather than implementation-focused (how it will be built).
+- If you have constraints (tech choices, compliance rules, performance requirements), include them in the description so they land in the spec.
+
+Example:
+
+```text
+/speckit.specify "Stock price alerts via email and in-app notifications"
+```
+
+What happens next:
+- Spec Kit assigns the next available feature ID (`NNNN`) and creates the spec under `.specify/specs/`.
+- You review/edit the spec and get it approved.
+- Then you run `/speckit.plan NNNN` using the ID from the new spec.
+
 #### Using `/speckit.plan`
 
 - **Input**: `NNNN`
