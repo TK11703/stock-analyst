@@ -88,6 +88,10 @@ Example:
 /speckit.plan 0007
 ```
 
+What happens next:
+- Review/edit the generated plan to ensure it matches the spec and fits the repo’s architecture.
+- Then run `/speckit.tasks NNNN` to break the plan into an ordered, executable task list.
+
 #### Using `/speckit.tasks`
 
 - **Input**: `NNNN`
@@ -101,6 +105,10 @@ Example:
 /speckit.tasks 0007
 ```
 
+What happens next:
+- Tackle the tasks in order (each task should be small enough to implement and test).
+- Then run `/speckit.implement NNNN` to execute the tasks and generate the code changes.
+
 #### Using `/speckit.implement`
 
 - **Input**: `NNNN`
@@ -113,6 +121,10 @@ Example:
 ```text
 /speckit.implement 0007
 ```
+
+What happens next:
+- Review the code changes locally and run `dotnet test`.
+- Open/merge a PR when CI is green, then iterate on feedback until the feature is complete.
 
 ### Prompt files (alternative to slash commands)
 
