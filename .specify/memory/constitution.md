@@ -3,7 +3,7 @@
 ## Core Principles
 
 ### I. Spec-First (NON-NEGOTIABLE)
-All features begin as a specification using `/speckit.specify`. No implementation begins without an approved spec. Specifications are the source of truth — code is their expression. Use `/speckit.plan` to define the technical approach before writing any code.
+All features begin as a specification using `/specify`. No implementation begins without an approved spec. Specifications are the source of truth — code is their expression. Use `/plan` to define the technical approach before writing any code.
 
 ### II. Test-Driven Development (NON-NEGOTIABLE)
 Tests are written from the spec before implementation. Follow Red-Green-Refactor strictly:
@@ -37,20 +37,20 @@ Start with the simplest design that satisfies the spec. Avoid over-engineering. 
 
 ## Development Workflow
 
-1. Run `/speckit.constitution` to review/amend principles.
-2. Run `/speckit.specify` to describe the feature.
+1. Run `/constitution` to review/amend principles.
+2. Run `/specify` to describe the feature.
    - **After the spec file is created**, the agent MUST:
      a. Create a dedicated `spec/<feature-name>` branch.
      b. Commit the spec file under `.specify/specs/` to that branch using the naming convention `NNNN-kebab-case-name.md`, where `NNNN` is a unique, auto-assigned 4-digit zero-padded sequential number (e.g., `0001-create-new-feature.md`). This number is shared by all related artifacts (plan, tasks, etc.) for the same feature.
      c. Open a Pull Request titled `Spec: <Feature Name>` (draft is acceptable).
      d. Include a review request in the PR description asking stakeholders to approve the spec before planning begins.
-3. Run `/speckit.plan` with stack and architecture decisions — only after the spec PR is approved.
+3. Run `/plan` with stack and architecture decisions — only after the spec PR is approved.
    - The plan is stored as `.specify/plans/NNNN-kebab-case-name.md` using the same `NNNN` as the spec.
-4. Run `/speckit.tasks` to generate actionable tasks.
+4. Run `/tasks` to generate actionable tasks.
    - Tasks are stored as `.specify/tasks/NNNN-kebab-case-name.md` using the same `NNNN` as the spec.
 5. Write tests (failing) before implementation.
 6. Implement until all tests pass.
-7. Run `/speckit.implement` with AI agent assistance when appropriate.
+7. Run `/implement` with AI agent assistance when appropriate.
 
 ## Artifact Naming & Storage
 

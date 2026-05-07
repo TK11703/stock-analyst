@@ -119,13 +119,13 @@ Follow these steps **in order** every time a spec is created or updated:
 
 ---
 
-### When a user invokes `/speckit.plan`
+### When a user invokes `/plan`
 
-`/speckit.plan` turns an approved spec into a full technical implementation plan. It **must** be invoked with a feature identifier.
+`/plan` turns an approved spec into a full technical implementation plan. It **must** be invoked with a feature identifier.
 
 **Accepted invocation forms**:
-- `/speckit.plan 0001` — numeric prefix only
-- `/speckit.plan 0001-remove-weather-sample-code` — full feature name
+- `/plan 0001` — numeric prefix only
+- `/plan 0001-remove-weather-sample-code` — full feature name
 
 **Steps (GitHub Copilot Agent / Coding Agent)**:
 
@@ -160,13 +160,13 @@ Follow these steps **in order** every time a spec is created or updated:
 
 ---
 
-### When a user invokes `/speckit.tasks`
+### When a user invokes `/tasks`
 
-`/speckit.tasks` breaks an approved plan into an ordered, actionable task list.
+`/tasks` breaks an approved plan into an ordered, actionable task list.
 
 **Accepted invocation forms**:
-- `/speckit.tasks 0001`
-- `/speckit.tasks 0001-remove-weather-sample-code`
+- `/tasks 0001`
+- `/tasks 0001-remove-weather-sample-code`
 
 > **Important — act immediately, no additional context required.**
 > A feature argument like `0001` is the numeric prefix of a spec file stored in `.specify/specs/`
@@ -204,22 +204,22 @@ Follow these steps **in order** every time a spec is created or updated:
 **Error handling**:
 - If no feature ID is provided, ask the user: "Which feature would you like to generate tasks for? Please provide the feature number (e.g., `0001`) or full name."
 - If `setup-tasks.sh` exits non-zero (spec or plan not found), report the error and stop.
-- Do **not** create tasks if the plan file does not exist — instruct the user to run `/speckit.plan <id>` first.
+- Do **not** create tasks if the plan file does not exist — instruct the user to run `/plan <id>` first.
 
 ---
 
-### When a user invokes `/speckit.implement`
+### When a user invokes `/implement`
 
-`/speckit.implement` executes the tasks in a tasks file, implementing the feature incrementally.
+`/implement` executes the tasks in a tasks file, implementing the feature incrementally.
 
 **Accepted invocation forms**:
-- `/speckit.implement 0001`
-- `/speckit.implement 0001-remove-weather-sample-code`
+- `/implement 0001`
+- `/implement 0001-remove-weather-sample-code`
 
 **Steps (GitHub Copilot Agent / Coding Agent)**:
 
 1. **Extract the feature ID** from the user's input.
-2. **Resolve artifact paths** (same pattern as `/speckit.tasks`):
+2. **Resolve artifact paths** (same pattern as `/tasks`):
    - Tasks: `.specify/tasks/<NNNN>-*.md`
    - Plan: `.specify/plans/<NNNN>-*.md`
    - Spec: `.specify/specs/<NNNN>-*.md`
@@ -234,7 +234,7 @@ Follow these steps **in order** every time a spec is created or updated:
 
 **Error handling**:
 - If no feature ID is provided, ask the user which feature to implement.
-- If the tasks file is missing, stop and instruct the user to run `/speckit.tasks <id>` first.
+- If the tasks file is missing, stop and instruct the user to run `/tasks <id>` first.
 - If build or tests fail, stop, report the failure, and wait for guidance before continuing.
 
 ---
@@ -252,10 +252,10 @@ Use these commands for the full spec-driven workflow:
 
 | Command | Purpose |
 |---|---|
-| `/speckit.specify` | Create or update a feature spec |
-| `/speckit.plan` | Turn a spec into a technical implementation plan |
-| `/speckit.tasks` | Break a plan into actionable tasks |
-| `/speckit.implement` | Execute implementation tasks |
-| `/speckit.constitution` | Review or amend project principles |
+| `/specify` | Create or update a feature spec |
+| `/plan` | Turn a spec into a technical implementation plan |
+| `/tasks` | Break a plan into actionable tasks |
+| `/implement` | Execute implementation tasks |
+| `/constitution` | Review or amend project principles |
 
 See `.specify/memory/constitution.md` for governing project principles.
