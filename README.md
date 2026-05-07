@@ -48,17 +48,17 @@ All speckit artifacts (specs, plans, tasks, etc.) must include a **4-digit zero-
 
 All of the commands below **require a feature ID (`NNNN`)** so Spec Kit knows which artifacts to read and which workstream to continue.
 
-1. `/speckit.constitution` — Review or amend project principles
-2. `/speckit.specify <feature description>` — Describe what you want to build (creates `.specify/specs/NNNN-kebab-case-name.md`)
-3. `/speckit.plan NNNN` — Turn the spec into a technical approach (creates/updates `.specify/plans/NNNN-kebab-case-name.md`)
-4. `/speckit.tasks NNNN` — Break the plan into actionable tasks (creates/updates `.specify/tasks/NNNN-kebab-case-name.md`)
-5. `/speckit.implement NNNN` — Execute implementation for the feature ID (uses `NNNN` spec/plan/tasks as source of truth)
+1. `/constitution` — Review or amend project principles
+2. `/specify <feature description>` — Describe what you want to build (creates `.specify/specs/NNNN-kebab-case-name.md`)
+3. `/plan NNNN` — Turn the spec into a technical approach (creates/updates `.specify/plans/NNNN-kebab-case-name.md`)
+4. `/tasks NNNN` — Break the plan into actionable tasks (creates/updates `.specify/tasks/NNNN-kebab-case-name.md`)
+5. `/implement NNNN` — Execute implementation for the feature ID (uses `NNNN` spec/plan/tasks as source of truth)
 
-#### Using `/speckit.specify`
+#### Using `/specify`
 
 - **Input**: A short feature description in plain English (no `NNNN` required)
 - **Writes**: `.specify/specs/NNNN-kebab-case-name.md`
-- **Purpose**: Creates the initial feature specification that becomes the source of truth for planning (`/speckit.plan`), task breakdown (`/speckit.tasks`), and implementation (`/speckit.implement`).
+- **Purpose**: Creates the initial feature specification that becomes the source of truth for planning (`/plan`), task breakdown (`/tasks`), and implementation (`/implement`).
 
 Tips:
 - Keep the description outcome-focused (what users can do) rather than implementation-focused (how it will be built).
@@ -67,15 +67,15 @@ Tips:
 Example:
 
 ```text
-/speckit.specify "Stock price alerts via email and in-app notifications"
+/specify "Stock price alerts via email and in-app notifications"
 ```
 
 What happens next:
 - Spec Kit assigns the next available feature ID (`NNNN`) and creates the spec under `.specify/specs/`.
 - You review/edit the spec and get it approved.
-- Then you run `/speckit.plan NNNN` using the ID from the new spec.
+- Then you run `/plan NNNN` using the ID from the new spec.
 
-#### Using `/speckit.plan`
+#### Using `/plan`
 
 - **Input**: `NNNN`
 - **Reads**: `.specify/specs/NNNN-*.md`
@@ -85,14 +85,14 @@ What happens next:
 Example:
 
 ```text
-/speckit.plan 0007
+/plan 0007
 ```
 
 What happens next:
 - Review/edit the generated plan to ensure it matches the spec and fits the repo’s architecture.
-- Then run `/speckit.tasks NNNN` to break the plan into an ordered, executable task list.
+- Then run `/tasks NNNN` to break the plan into an ordered, executable task list.
 
-#### Using `/speckit.tasks`
+#### Using `/tasks`
 
 - **Input**: `NNNN`
 - **Reads**: `.specify/plans/NNNN-*.md` (and spec as needed)
@@ -102,14 +102,14 @@ What happens next:
 Example:
 
 ```text
-/speckit.tasks 0007
+/tasks 0007
 ```
 
 What happens next:
 - Tackle the tasks in order (each task should be small enough to implement and test).
-- Then run `/speckit.implement NNNN` to execute the tasks and generate the code changes.
+- Then run `/implement NNNN` to execute the tasks and generate the code changes.
 
-#### Using `/speckit.implement`
+#### Using `/implement`
 
 - **Input**: `NNNN`
 - **Reads**: `.specify/specs/NNNN-*.md`, `.specify/plans/NNNN-*.md`, `.specify/tasks/NNNN-*.md`
@@ -119,7 +119,7 @@ What happens next:
 Example:
 
 ```text
-/speckit.implement 0007
+/implement 0007
 ```
 
 What happens next:

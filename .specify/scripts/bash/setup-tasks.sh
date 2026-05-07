@@ -83,7 +83,7 @@ fi
 # Verify the plan file exists — tasks require a plan
 if [[ ! -f "$IMPL_PLAN" ]]; then
     echo "ERROR: Plan file not found at '$IMPL_PLAN'" >&2
-    echo "Please run '/speckit.plan $(basename "$FEATURE_SPEC" .md)' first to create the plan." >&2
+    echo "Please run '/plan $(basename "$FEATURE_SPEC" .md)' first to create the plan." >&2
     exit 1
 fi
 

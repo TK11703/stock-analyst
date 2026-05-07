@@ -57,8 +57,8 @@ The coding agent can write files directly to the repository.
 2. The agent will create `specs/<feature>/plan.md` (or output the plan for review).
 
 You can invoke the Speckit commands directly:
-- `/speckit.specify` — guided spec creation workflow
-- `/speckit.plan` — guided plan creation from an existing spec
+- `/specify` — guided spec creation workflow
+- `/plan` — guided plan creation from an existing spec
 
 ---
 
@@ -77,8 +77,8 @@ In VS Code, Copilot Chat can create files directly in your workspace.
 2. Copilot reads the existing spec and produces a step-by-step implementation plan.
 
 You can also use the Speckit slash commands in VS Code chat:
-- `/speckit.specify` — interactive spec creation
-- `/speckit.plan` — implementation planning from a spec
+- `/specify` — interactive spec creation
+- `/plan` — implementation planning from a spec
 
 ---
 
@@ -86,10 +86,10 @@ You can also use the Speckit slash commands in VS Code chat:
 
 | Prompt / Command | Output |
 |---|---|
-| `feature-spec` prompt or `/speckit.specify` | `specs/<feature>.md` — feature specification |
-| `feature-plan` prompt or `/speckit.plan` | `specs/<feature>/plan.md` — implementation plan |
-| `/speckit.tasks` | `specs/<feature>/tasks.md` — task breakdown |
-| `/speckit.implement` | Code changes implementing the tasks |
+| `feature-spec` prompt or `/specify` | `specs/<feature>.md` — feature specification |
+| `feature-plan` prompt or `/plan` | `specs/<feature>/plan.md` — implementation plan |
+| `/tasks` | `specs/<feature>/tasks.md` — task breakdown |
+| `/implement` | Code changes implementing the tasks |
 
 ---
 
@@ -121,11 +121,11 @@ Update the **Status** field in the spec file as it moves through the lifecycle.
 For the complete guided workflow using Speckit slash commands:
 
 ```
-/speckit.constitution  →  Review/amend project principles
-/speckit.specify       →  Create feature spec
-/speckit.plan          →  Create implementation plan
-/speckit.tasks         →  Generate task list
-/speckit.implement     →  Execute implementation
+/constitution  →  Review/amend project principles
+/specify       →  Create feature spec
+/plan          →  Create implementation plan
+/tasks         →  Generate task list
+/implement     →  Execute implementation
 ```
 
 See `.specify/memory/constitution.md` for the project's governing principles.
